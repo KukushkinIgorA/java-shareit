@@ -7,6 +7,7 @@ public enum BookingStatus {
     CANCELED("бронирование отменено создателем");
 
     private final String label;
+
     BookingStatus(String label) {
         this.label = label;
     }
