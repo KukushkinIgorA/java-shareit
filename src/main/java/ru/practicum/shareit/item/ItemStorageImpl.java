@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository("itemStorage")
-public class ItemStorageImpl implements ItemStorage{
+public class ItemStorageImpl implements ItemStorage {
     int nextId = 1;
     Map<Integer, Item> itemMap = new HashMap<>();
 
@@ -42,7 +42,7 @@ public class ItemStorageImpl implements ItemStorage{
     @Override
     public List<Item> findItems(int userId, String searchString) {
         List<Item> items;
-        if (searchString.isEmpty()){
+        if (searchString.isEmpty()) {
             items = Collections.emptyList();
         } else {
             items = itemMap.values().stream()

@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class ItemServiceImpl implements ItemService{
+public class ItemServiceImpl implements ItemService {
     public final ItemStorage itemStorage;
 
     public final UserStorage userStorage;
@@ -37,7 +37,7 @@ public class ItemServiceImpl implements ItemService{
     public ItemDto update(int userId, int itemId, ItemDto itemDto) {
         getValidUser(userId);
         Item item = getValidItem(itemId);
-        if(item.getOwner().getId() != userId) {
+        if (item.getOwner().getId() != userId) {
             throw new ForbiddenException(
                     String.format("Пользователю не хватает прав на редактирование вещи c id = %s", itemId));
         }
@@ -64,7 +64,7 @@ public class ItemServiceImpl implements ItemService{
 
     private User getValidUser(int userId) {
         User user = userStorage.findUser(userId);
-        if(user == null) {
+        if (user == null) {
             throw new NotFoundException(String.format("на сервере отстутствует пользователь c id = %s", userId));
         }
         return user;
@@ -72,7 +72,7 @@ public class ItemServiceImpl implements ItemService{
 
     private Item getValidItem(int itemId) {
         Item item = itemStorage.findItem(itemId);
-        if(itemStorage.findItem(itemId) == null){
+        if (itemStorage.findItem(itemId) == null) {
             throw new NotFoundException(String.format("на сервере отстутствует вещь c id = %s", itemId));
         }
         return item;

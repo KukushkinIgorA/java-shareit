@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     private final UserStorage userStorage;
 
@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public UserDto update(int userId, UserDto userDto) {
         validate(userDto);
-        if(userStorage.findUser(userId) == null){
+        if (userStorage.findUser(userId) == null) {
             throw new NotFoundException(String.format("на сервере отстутствует пользователь c id = %s", userId));
         }
         userDto.setId(userId);
@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public UserDto findUser(int userId) {
         User user = userStorage.findUser(userId);
-        if(user == null){
+        if (user == null) {
             throw new NotFoundException(String.format("на сервере отстутствует пользователь c id = %s", userId));
         }
         return UserMapper.toUserDto(user);
@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService{
     }
 
     private void validate(UserDto userDto) {
-        if(userDto.getEmail() != null && userStorage.findAll().stream().filter(user -> userDto.getId() != user.getId()).anyMatch(user -> user.getEmail().equals(userDto.getEmail()))){
+        if (userDto.getEmail() != null && userStorage.findAll().stream().filter(user -> userDto.getId() != user.getId()).anyMatch(user -> user.getEmail().equals(userDto.getEmail()))) {
             throw new ConflictException(String.format("электронная почта не уникальна: %s", userDto.getEmail()));
         }
     }

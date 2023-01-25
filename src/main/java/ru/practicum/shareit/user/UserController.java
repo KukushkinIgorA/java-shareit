@@ -38,19 +38,19 @@ public class UserController {
 
     @PatchMapping("{id}")
     public UserDto update(@PathVariable("id") int userId,
-            @Validated(Update.class) @RequestBody UserDto userDto) {
+                          @Validated(Update.class) @RequestBody UserDto userDto) {
         log.info("Запрос на обновление пользователя {}", userId);
         return userService.update(userId, userDto);
     }
 
     @GetMapping("{id}")
-    public UserDto findUser (@PathVariable("id") int userId) {
+    public UserDto findUser(@PathVariable("id") int userId) {
         log.info("Запрос пользователя по id: {}", userId);
         return userService.findUser(userId);
     }
 
     @DeleteMapping("{id}")
-    public void deleteUser (@PathVariable("id") int userId){
+    public void deleteUser(@PathVariable("id") int userId) {
         log.info("Запрос на удаление пользователя по id: {}", userId);
         userService.deleteUser(userId);
     }

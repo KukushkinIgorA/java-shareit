@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 @Repository("userStorage")
-public class UserStorageImpl implements UserStorage{
+public class UserStorageImpl implements UserStorage {
 
     int nextId = 1;
     Map<Integer, User> userMap = new HashMap<>();
