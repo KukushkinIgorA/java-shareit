@@ -16,29 +16,11 @@ import ru.practicum.shareit.exception.ValidationException;
 public class ErrorHandler {
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleNumberFormatException(final NumberFormatException e) {
-        log.error("Ошибка number format exception", e);
-        return new ErrorResponse(
-                String.format("Ошибка number format exception: %s", e.getMessage())
-        );
-    }
-
-    @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(final NotFoundException e) {
         log.error("Ошибка not found", e);
         return new ErrorResponse(
-                String.format("Ошибка not found: %s", e.getMessage())
-        );
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidationException(final ValidationException e) {
-        log.error("Ошибка bad request", e);
-        return new ErrorResponse(
-                String.format("Ошибка bad request: %s", e.getMessage())
+                String.format("Ошибка %s: %s", e.getClass().getSimpleName(), e.getMessage())
         );
     }
 
@@ -47,25 +29,25 @@ public class ErrorHandler {
     public ErrorResponse handleConflictException(final ConflictException e) {
         log.error("Ошибка conflict", e);
         return new ErrorResponse(
-                String.format("Ошибка bad request: %s", e.getMessage())
-        );
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleConflictException(final MethodArgumentNotValidException e) {
-        log.error("Ошибка bad request ", e);
-        return new ErrorResponse(
-                String.format("Ошибка bad request: %s", e.getMessage())
+                String.format("Ошибка %s: %s", e.getClass().getSimpleName(), e.getMessage())
         );
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErrorResponse handleForbiddenException(final ForbiddenException e) {
-        log.error("Ошибка forbidden ", e);
+        log.error("Ошибка forbidden", e);
         return new ErrorResponse(
-                String.format("Ошибка forbidden: %s", e.getMessage())
+                String.format("Ошибка %s: %s", e.getClass().getSimpleName(), e.getMessage())
+        );
+    }
+
+    @ExceptionHandler({NumberFormatException.class, ValidationException.class, MethodArgumentNotValidException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleRuntimeException(Throwable e) {
+        log.error("Ошибка bad request", e);
+        return new ErrorResponse(
+                String.format("Ошибка %s: %s", e.getClass().getSimpleName(), e.getMessage())
         );
     }
 
