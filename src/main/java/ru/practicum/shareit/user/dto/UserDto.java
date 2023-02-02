@@ -1,37 +1,26 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.shareit.user.dto;
 
 import lombok.*;
-import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.indicators.Create;
 import ru.practicum.shareit.indicators.Update;
-import ru.practicum.shareit.user.model.User;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-
-/**
- *
- */
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ItemDto {
+public class UserDto {
     @NotNull(groups = {Update.class})
-    private int id;
+    int id;
 
     @NotBlank(groups = {Create.class})
-    private String name;
+    String name;
 
     @NotBlank(groups = {Create.class})
-    private String description;
-
-    @NotNull(groups = {Create.class})
-    private Boolean available;
-
-    private User owner;
-
-    private ItemRequest request;
+    @Email(groups = {Create.class, Update.class})
+    String email;
 }
