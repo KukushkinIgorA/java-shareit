@@ -51,6 +51,14 @@ public class ErrorHandler {
         );
     }
 
+    //Костыль для Enum в тестах postman
+    @ExceptionHandler({IllegalArgumentException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleRuntimeExceptionEnum(Throwable e) {
+        log.error("Ошибка bad request", e);
+        return new ErrorResponse(e.getMessage());
+    }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleThrowable(final Throwable e) {
