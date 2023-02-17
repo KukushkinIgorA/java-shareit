@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 public class CommentDto {
     private int id;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private LocalDateTime created;
 
     @NotBlank

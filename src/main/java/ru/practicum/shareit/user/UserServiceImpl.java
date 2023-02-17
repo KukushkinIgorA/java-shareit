@@ -37,9 +37,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto update(int userId, UserDto userDto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(
-                        String.format("на сервере отстутствует пользователь c id = %s", userId)));
+        User user = getValidUser(userId);
         userDto.setId(userId);
         userDto.setName(userDto.getName() != null ? userDto.getName() : user.getName());
         userDto.setEmail(userDto.getEmail() != null ? userDto.getEmail() : user.getEmail());
@@ -48,15 +46,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto findUser(int userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(
-                        String.format("на сервере отстутствует пользователь c id = %s", userId)));
+        User user = getValidUser(userId);
         return UserMapper.toUserDto(user);
     }
 
     @Transactional
     @Override
     public void deleteUser(int userId) {
+        getValidUser(userId);
         userRepository.deleteById(userId);
+    }
+
+    private User getValidUser(int userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("на сервере отстутствует пользователь c id = %s", userId)));
     }
 }

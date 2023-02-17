@@ -52,8 +52,7 @@ public class BookingController {
     public List<BookingDto> findUserBooking(@RequestHeader(X_SHARER_USER_ID) int userId,
                                             @RequestParam(name = "state", defaultValue = "ALL") String bookingGetStateString) {
         log.info("Запрос бронирований пользователя: {}", userId);
-        BookingGetState bookingGetState = BookingGetState.from(bookingGetStateString).orElseThrow(() ->
-                new IllegalArgumentException("Unknown state: " + bookingGetStateString));
+        BookingGetState bookingGetState = checkBookingGetState(bookingGetStateString);
         return bookingService.findUserBooking(userId, bookingGetState);
     }
 
@@ -61,8 +60,12 @@ public class BookingController {
     public List<BookingDto> findItemUserBooking(@RequestHeader(X_SHARER_USER_ID) int userId,
                                                 @RequestParam(name = "state", defaultValue = "ALL") String bookingGetStateString) {
         log.info("Запрос бронирований для всех вещей пользователя: {}", userId);
-        BookingGetState bookingGetState = BookingGetState.from(bookingGetStateString).orElseThrow(() ->
-                new IllegalArgumentException("Unknown state: " + bookingGetStateString));
+        BookingGetState bookingGetState = checkBookingGetState(bookingGetStateString);
         return bookingService.findItemUserBooking(userId, bookingGetState);
+    }
+
+    private static BookingGetState checkBookingGetState(String bookingGetStateString) {
+        return BookingGetState.from(bookingGetStateString).orElseThrow(() ->
+                new IllegalArgumentException("Unknown state: " + bookingGetStateString));
     }
 }
