@@ -1,29 +1,30 @@
-package ru.practicum.shareit.booking.dto;
+package ru.practicum.shareit.item.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
-import ru.practicum.shareit.dictionary.BookingStatus;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
-/**
- *
- */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BookingDto {
+public class CommentDto {
     private int id;
-    private BookingStatus status;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private LocalDateTime start;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private LocalDateTime end;
-    private int itemId;
+    private LocalDateTime created;
+
+    @NotBlank
+    private String text;
+
     private Item item;
-    private User booker;
+
+    private User author;
+
+    private String authorName;
 }

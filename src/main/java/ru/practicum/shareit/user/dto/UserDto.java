@@ -21,6 +21,6 @@ public class UserDto {
     String name;
 
     @NotBlank(groups = {Create.class})
-    @Email(groups = {Create.class, Update.class})
+    @Email(groups = {Create.class, Update.class}, message = "Не валидный email")
     String email;
 }

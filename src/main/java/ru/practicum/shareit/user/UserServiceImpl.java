@@ -3,7 +3,7 @@ package ru.practicum.shareit.user;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.ConflictException;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
@@ -13,53 +13,53 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
-    private final UserStorage userStorage;
+    private final UserRepository userRepository;
 
     @Autowired
-    public UserServiceImpl(UserStorage userStorage) {
-        this.userStorage = userStorage;
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
     public List<UserDto> findAll() {
-        return userStorage.findAll().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
+        return userRepository.findAll().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
     }
 
     @Override
+    @Transactional
     public UserDto create(UserDto userDto) {
-        validate(userDto);
-        return UserMapper.toUserDto(userStorage.create(UserMapper.toUser(userDto)));
+        return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(userDto)));
     }
 
     @Override
+    @Transactional
     public UserDto update(int userId, UserDto userDto) {
-        validate(userDto);
-        if (userStorage.findUser(userId) == null) {
-            throw new NotFoundException(String.format("на сервере отстутствует пользователь c id = %s", userId));
-        }
+        User user = getValidUser(userId);
         userDto.setId(userId);
-        return UserMapper.toUserDto(userStorage.update(UserMapper.toUser(userDto)));
+        userDto.setName(userDto.getName() != null ? userDto.getName() : user.getName());
+        userDto.setEmail(userDto.getEmail() != null ? userDto.getEmail() : user.getEmail());
+        return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(userDto)));
     }
 
     @Override
     public UserDto findUser(int userId) {
-        User user = userStorage.findUser(userId);
-        if (user == null) {
-            throw new NotFoundException(String.format("на сервере отстутствует пользователь c id = %s", userId));
-        }
+        User user = getValidUser(userId);
         return UserMapper.toUserDto(user);
     }
 
+    @Transactional
     @Override
     public void deleteUser(int userId) {
-        userStorage.deleteUser(userId);
+        getValidUser(userId);
+        userRepository.deleteById(userId);
     }
 
-    private void validate(UserDto userDto) {
-        if (userDto.getEmail() != null && userStorage.findAll().stream().filter(user -> userDto.getId() != user.getId()).anyMatch(user -> user.getEmail().equals(userDto.getEmail()))) {
-            throw new ConflictException(String.format("электронная почта не уникальна: %s", userDto.getEmail()));
-        }
+    private User getValidUser(int userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("на сервере отстутствует пользователь c id = %s", userId)));
     }
 }
