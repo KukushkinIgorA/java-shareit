@@ -1,4 +1,4 @@
-drop table if exists items, users, bookings, comments;
+drop table if exists items, users, bookings, comments, requests;
 
 create table if not exists users
 (
@@ -8,6 +8,18 @@ create table if not exists users
     name     varchar(32) not null,
     email    varchar(255) not null,
     constraint uq_user_email unique (email)
+);
+
+create table if not exists requests
+(
+    request_id     integer generated always as identity
+        constraint pk_requests
+            primary key,
+    created timestamp without time zone not null,
+    description         varchar(512) not null,
+    requestor_id      integer     not null
+        constraint requests_users_null_fk
+            references users (user_id)
 );
 
 create table if not exists items
@@ -20,7 +32,10 @@ create table if not exists items
     available   boolean default false,
     owner_id    integer     not null
         constraint items_users_null_fk
-            references users (user_id)
+            references users (user_id),
+    request_id integer
+        constraint items_requests_null_fk
+            references requests (request_id)
 );
 
 create table if not exists bookings

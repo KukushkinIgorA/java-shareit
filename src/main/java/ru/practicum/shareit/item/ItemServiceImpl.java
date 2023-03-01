@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingRepository;
@@ -13,7 +14,9 @@ import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.UserRepository;
+import ru.practicum.shareit.request.ItemRequestService;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
@@ -27,16 +30,19 @@ import java.util.stream.Collectors;
 public class ItemServiceImpl implements ItemService {
     public final ItemRepository itemRepository;
 
-    public final UserRepository userRepository;
+    public final UserService userService;
+
+    public final ItemRequestService itemRequestService;
 
     public final BookingRepository bookingRepository;
 
     public final CommentRepository commentRepository;
 
     @Autowired
-    public ItemServiceImpl(ItemRepository itemRepository, UserRepository userRepository, BookingRepository bookingRepository, CommentRepository commentRepository) {
+    public ItemServiceImpl(ItemRepository itemRepository, UserService userService, ItemRequestService itemRequestService, BookingRepository bookingRepository, CommentRepository commentRepository) {
         this.itemRepository = itemRepository;
-        this.userRepository = userRepository;
+        this.userService = userService;
+        this.itemRequestService = itemRequestService;
         this.bookingRepository = bookingRepository;
         this.commentRepository = commentRepository;
     }
@@ -44,15 +50,20 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public ItemDto create(int userId, ItemDto itemDto) {
-        User user = getValidUser(userId);
+        User user = userService.getValidUser(userId);
         itemDto.setOwner(user);
-        return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(itemDto)));
+        Item item = ItemMapper.toItem(itemDto);
+        if (itemDto.getRequestId() != 0) {
+            ItemRequest itemRequest = itemRequestService.getValidItemRequest(itemDto.getRequestId());
+            item.setItemRequest(itemRequest);
+        }
+        return ItemMapper.toItemDto(itemRepository.save(item));
     }
 
     @Override
     @Transactional
     public ItemDto update(int userId, int itemId, ItemDto itemDto) {
-        User user = getValidUser(userId);
+        User user = userService.getValidUser(userId);
         Item item = getValidItem(itemId);
         if (item.getOwner().getId() != userId) {
             throw new ForbiddenException(
@@ -69,7 +80,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto findItem(int userId, int itemId) {
-        getValidUser(userId);
+        userService.getValidUser(userId);
         Item item = getValidItem(itemId);
         ItemDto itemDto = ItemMapper.toItemDto(item);
         findBookingDateTime(itemDto, userId);
@@ -78,20 +89,22 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> findUserItems(int userId) {
-        User user = getValidUser(userId);
-        return itemRepository.findByOwnerOrderById(user).stream().map(ItemMapper::toItemDto)
+    public List<ItemDto> findUserItems(int userId, int from, int size) {
+        User user = userService.getValidUser(userId);
+        return itemRepository.findByOwnerOrderById(user,
+                        PageRequest.of(from / size, size)).stream().map(ItemMapper::toItemDto)
                 .map(itemDto -> findBookingDateTime(itemDto, userId))
                 .map(this::findComments)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<ItemDto> findItems(int userId, String searchString) {
+    public List<ItemDto> findItems(int userId, String searchString, int from, int size) {
         if (searchString.isEmpty()) {
             return Collections.emptyList();
         } else {
-            return itemRepository.findItemBySearchString(searchString.toLowerCase())
+            return itemRepository.findItemBySearchString(searchString.toLowerCase(),
+                            PageRequest.of(from / size, size))
                     .stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
         }
     }
@@ -99,7 +112,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public CommentDto createComment(int userId, int itemId, CommentDto commentDto) {
-        User user = getValidUser(userId);
+        User user = userService.getValidUser(userId);
         Item item = getValidItem(itemId);
         if (bookingRepository.findByBooker_IdAndItem_Id(userId, itemId)
                 .stream()
@@ -111,13 +124,8 @@ public class ItemServiceImpl implements ItemService {
         return CommentMapper.toCommentDto(commentRepository.save(CommentMapper.toComment(commentDto)));
     }
 
-    private User getValidUser(int userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(
-                        String.format("на сервере отстутствует пользователь c id = %s", userId)));
-    }
-
-    private Item getValidItem(int itemId) {
+    @Override
+    public Item getValidItem(int itemId) {
         return itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException(
                         String.format("на сервере отстутствует вещь c id = %s", itemId)));

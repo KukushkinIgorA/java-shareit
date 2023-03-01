@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode
+@ToString
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,6 +24,7 @@ public class Comment {
     @Column(name = "text", nullable = false, length = 512)
     private String text;
 
+    @EqualsAndHashCode.Exclude
     @Column(name = "created", nullable = false)
     private LocalDateTime created;
 

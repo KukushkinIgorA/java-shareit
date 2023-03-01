@@ -10,7 +10,12 @@ import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
+
+import static ru.practicum.shareit.params.PaginationParam.DEFAULT_PAGE_SIZE;
+import static ru.practicum.shareit.params.PaginationParam.DEFAULT_START_INDEX;
 
 /**
  *
@@ -50,16 +55,24 @@ public class ItemController {
     }
 
     @GetMapping()
-    public List<ItemDto> findUserItems(@RequestHeader(X_SHARER_USER_ID) int userId) {
+    public List<ItemDto> findUserItems(@RequestHeader(X_SHARER_USER_ID) int userId,
+                                       @PositiveOrZero @RequestParam(name = "from",
+                                               defaultValue = DEFAULT_START_INDEX) int from,
+                                       @Positive @RequestParam(name = "size",
+                                               defaultValue = DEFAULT_PAGE_SIZE) int size) {
         log.info("Запрос всех вещей пользователя");
-        return itemService.findUserItems(userId);
+        return itemService.findUserItems(userId, from, size);
     }
 
     @GetMapping("search")
     public List<ItemDto> findItems(@RequestHeader(X_SHARER_USER_ID) int userId,
-                                   @RequestParam(name = "text", required = false) String searchString) {
+                                   @RequestParam(name = "text", required = false) String searchString,
+                                   @PositiveOrZero @RequestParam(name = "from",
+                                           defaultValue = DEFAULT_START_INDEX) int from,
+                                   @Positive @RequestParam(name = "size",
+                                           defaultValue = DEFAULT_PAGE_SIZE) int size) {
         log.info("Поиск вещей потенциальным арендатором. Строка запроса: {}", searchString);
-        return itemService.findItems(userId, searchString);
+        return itemService.findItems(userId, searchString, from, size);
     }
 
     //POST /items/{itemId}/comment

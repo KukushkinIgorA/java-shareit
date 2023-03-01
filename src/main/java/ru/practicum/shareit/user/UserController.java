@@ -8,7 +8,12 @@ import ru.practicum.shareit.indicators.Create;
 import ru.practicum.shareit.indicators.Update;
 import ru.practicum.shareit.user.dto.UserDto;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
+
+import static ru.practicum.shareit.params.PaginationParam.DEFAULT_PAGE_SIZE;
+import static ru.practicum.shareit.params.PaginationParam.DEFAULT_START_INDEX;
 
 /**
  *
@@ -16,6 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/users")
 @Slf4j
+@Validated
 public class UserController {
     private final UserService userService;
 
@@ -25,9 +31,14 @@ public class UserController {
     }
 
     @GetMapping()
-    public List<UserDto> findAll() {
+    public List<UserDto> findAll(@PositiveOrZero @RequestParam(name = "from",
+                                            defaultValue = DEFAULT_START_INDEX) int from,
+                                 @Positive @RequestParam(name = "size",
+                                            defaultValue = DEFAULT_PAGE_SIZE) int size
+
+    ) {
         log.info("Запрос всех пользователей");
-        return userService.findAll();
+        return userService.findAll(from, size);
     }
 
     @PostMapping()

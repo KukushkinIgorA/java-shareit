@@ -2,6 +2,7 @@ package ru.practicum.shareit.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -24,8 +25,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> findAll() {
-        return userRepository.findAll().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
+    public List<UserDto> findAll(int from, int size) {
+        return userRepository.findAll(PageRequest.of(from / size, size)).stream().map(UserMapper::toUserDto).collect(Collectors.toList());
     }
 
     @Override
@@ -57,7 +58,8 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(userId);
     }
 
-    private User getValidUser(int userId) {
+    @Override
+    public User getValidUser(int userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(
                         String.format("на сервере отстутствует пользователь c id = %s", userId)));

@@ -23,6 +23,7 @@ public class BookingMapper {
                 .start(bookingDto.getStart())
                 .end(bookingDto.getEnd())
                 .booker(bookingDto.getBooker())
+                .item(bookingDto.getItem())
                 .build();
     }
 }
