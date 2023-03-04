@@ -8,7 +8,12 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.dictionary.BookingGetState;
 import ru.practicum.shareit.indicators.Create;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
+
+import static ru.practicum.shareit.params.PaginationParam.DEFAULT_PAGE_SIZE;
+import static ru.practicum.shareit.params.PaginationParam.DEFAULT_START_INDEX;
 
 /**
  *
@@ -16,6 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/bookings")
 @Slf4j
+@Validated
 public class BookingController {
     public static final String X_SHARER_USER_ID = "X-Sharer-User-Id";
     private final BookingService bookingService;
@@ -50,18 +56,28 @@ public class BookingController {
 
     @GetMapping()
     public List<BookingDto> findUserBooking(@RequestHeader(X_SHARER_USER_ID) int userId,
-                                            @RequestParam(name = "state", defaultValue = "ALL") String bookingGetStateString) {
+                                            @RequestParam(name = "state",
+                                                    defaultValue = "ALL") String bookingGetStateString,
+                                            @PositiveOrZero @RequestParam(name = "from",
+                                                    defaultValue = DEFAULT_START_INDEX) int from,
+                                            @Positive @RequestParam(name = "size",
+                                                    defaultValue = DEFAULT_PAGE_SIZE) int size) {
         log.info("Запрос бронирований пользователя: {}", userId);
         BookingGetState bookingGetState = checkBookingGetState(bookingGetStateString);
-        return bookingService.findUserBooking(userId, bookingGetState);
+        return bookingService.findUserBooking(userId, bookingGetState, from, size);
     }
 
     @GetMapping("owner")
     public List<BookingDto> findItemUserBooking(@RequestHeader(X_SHARER_USER_ID) int userId,
-                                                @RequestParam(name = "state", defaultValue = "ALL") String bookingGetStateString) {
+                                                @RequestParam(name = "state",
+                                                        defaultValue = "ALL") String bookingGetStateString,
+                                                @PositiveOrZero @RequestParam(name = "from",
+                                                        defaultValue = DEFAULT_START_INDEX) int from,
+                                                @Positive @RequestParam(name = "size",
+                                                        defaultValue = DEFAULT_PAGE_SIZE) int size) {
         log.info("Запрос бронирований для всех вещей пользователя: {}", userId);
         BookingGetState bookingGetState = checkBookingGetState(bookingGetStateString);
-        return bookingService.findItemUserBooking(userId, bookingGetState);
+        return bookingService.findItemUserBooking(userId, bookingGetState, from, size);
     }
 
     private static BookingGetState checkBookingGetState(String bookingGetStateString) {

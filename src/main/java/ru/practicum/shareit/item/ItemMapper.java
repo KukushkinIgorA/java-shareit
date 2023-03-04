@@ -13,7 +13,7 @@ public class ItemMapper {
                 .description(item.getDescription())
                 .available(item.getAvailable())
                 .owner(item.getOwner())
-                //.request(item.getRequest())
+                .requestId(item.getItemRequest() != null ? item.getItemRequest().getId() : 0)
                 .build();
     }
 
@@ -24,7 +24,6 @@ public class ItemMapper {
                 .description(itemDto.getDescription())
                 .available(itemDto.getAvailable())
                 .owner(itemDto.getOwner())
-                //.request(itemDto.getRequest())
                 .build();
     }
 

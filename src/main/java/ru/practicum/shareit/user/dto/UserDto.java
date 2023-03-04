@@ -13,6 +13,8 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode
+@ToString
 public class UserDto {
     @NotNull(groups = {Update.class})
     int id;

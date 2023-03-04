@@ -3,7 +3,6 @@ package ru.practicum.shareit.item.dto;
 import lombok.*;
 import ru.practicum.shareit.indicators.Create;
 import ru.practicum.shareit.indicators.Update;
-import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import javax.validation.constraints.NotBlank;
@@ -19,6 +18,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode
+@ToString
 public class ItemDto {
     @NotNull(groups = {Update.class})
     private int id;
@@ -34,7 +35,7 @@ public class ItemDto {
 
     private User owner;
 
-    private ItemRequest request;
+    private int requestId;
 
     private BookingItemDto lastBooking;
 

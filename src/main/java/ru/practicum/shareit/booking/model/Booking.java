@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.model;
 
 import lombok.*;
 import ru.practicum.shareit.dictionary.BookingStatus;
+import ru.practicum.shareit.dictionary.BookingStatusConverter;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
@@ -18,6 +19,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode
+@ToString
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +28,7 @@ public class Booking {
     private int id;
 
     @Column(name = "status", nullable = false, length = 16)
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = BookingStatusConverter.class)
     private BookingStatus status;
 
     @Column(name = "start_date", nullable = false)
