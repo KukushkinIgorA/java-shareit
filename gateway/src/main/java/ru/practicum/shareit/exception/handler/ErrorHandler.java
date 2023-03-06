@@ -37,7 +37,7 @@ public class ErrorHandler {
     public ErrorResponse handleRuntimeException(Throwable e) {
         log.error("Ошибка bad request", e);
         return new ErrorResponse(
-                String.format("Ошибка %s: %s", e.getClass().getSimpleName(), e.getMessage())
+                String.format("Ошибка %s: %s", e.getClass().getSimpleName(), e.getLocalizedMessage())
         );
     }
 

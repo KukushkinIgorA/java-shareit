@@ -1,6 +1,7 @@
 package ru.practicum.shareit.exception.handler;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,6 +19,15 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(final NotFoundException e) {
         log.error("Ошибка not found", e);
+        return new ErrorResponse(
+                String.format("Ошибка %s: %s", e.getClass().getSimpleName(), e.getMessage())
+        );
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleNotFoundException(final DataIntegrityViolationException e) {
+        log.error("Ошибка conflict", e);
         return new ErrorResponse(
                 String.format("Ошибка %s: %s", e.getClass().getSimpleName(), e.getMessage())
         );
